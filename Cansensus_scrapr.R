@@ -259,6 +259,51 @@ write.csv(Oakdata25, "Oakdata25.csv")
 #Assuming that 2a has all the data required for the analysis.
 #Creating a for loop to get data for all CSDs in Ontario
 
+# create a dataset for vectors we want
+
+nreal <- list_census_vectors('CA16')
+
+vectors_real = c("v_CA16_454","v_CA16_463","v_CA16_466","v_CA16_469","v_CA16_472","v_CA16_475","v_CA16_2207","v_CA16_2209","v_CA16_2208", "v_CA16_408","v_CA16_409",
+            "v_CA16_410","v_CA16_411","v_CA16_417","v_CA16_479","v_CA16_480","v_CA16_481","v_CA16_482","v_CA16_483",
+            "v_CA16_2309","v_CA16_2312","v_CA16_2315","v_CA16_2318","v_CA16_2321",
+            "v_CA16_2324","v_CA16_2327","v_CA16_2330","v_CA16_2333","v_CA16_2336","v_CA16_2339",
+            "v_CA16_2342","v_CA16_2570","v_CA16_2540","v_CA16_5795","v_CA16_5798",
+            "v_CA16_5801","v_CA16_5804","v_CA16_5807","v_CA16_5810","v_CA16_5816","v_CA16_5819",
+            "v_CA16_5822","v_CA16_5825","v_CA16_5828",
+            "v_CA16_2427","v_CA16_2428","v_CA16_2429","v_CA16_2430","v_CA16_2431","v_CA16_2432","v_CA16_2433","v_CA16_2434","v_CA16_2435","v_CA16_2436",
+            "v_CA16_2437","v_CA16_2438","v_CA16_2439","v_CA16_2440","v_CA16_2441","v_CA16_2442",
+            "v_CA16_4893","v_CA16_4894","v_CA16_4895","v_CA16_4896","v_CA16_4891","v_CA16_4892",
+            "v_CA16_4897","v_CA16_4898","v_CA16_4898","v_CA16_4899","v_CA16_4900","v_CA16_4901",
+            "v_CA16_5099","v_CA16_5102","v_CA16_5108","v_CA16_5117","v_CA16_5120","v_CA16_5123",
+            "v_CA16_5603","v_CA16_5606","v_CA16_5609","v_CA16_5663","v_CA16_5669","v_CA16_5672","v_CA16_5675",
+            "v_CA16_5678","v_CA16_5681","v_CA16_5684","v_CA16_5687","v_CA16_5690",
+            "v_CA16_4002","v_CA16_4806","v_CA16_4014","v_CA16_4044","v_CA16_4266","v_CA16_4329","v_CA16_4611","v_CA16_4698",
+            "v_CA16_4743","v_CA16_4800","v_CA16_3408","v_CA16_3411","v_CA16_3435")
+
+list_vectors <- list_census_vectors("CA16")
+
+# Grab only data with these vectors 
+matched_vectors <- list_vectors[list_vectors$vector %in% vectors_real, ,drop=FALSE]
+
+
+ureal <- list_census_vectors('CA11')
+
+# Filter Dataset to keep only rows that match
+filtered_dataset2 <- semi_join(ureal, matched_vectors, by = c("type", "label"))
+
+# Print the filtered dataset
+print(filtered_dataset2)
+
+# Get variables in matched_vectors that were NOT in ureal
+unmatched_matched_vectors <- anti_join(matched_vectors, ureal, by = c("type", "label"))
+
+# Print the unmatched rows
+print(unmatched_matched_vectors)
+
+
+write.csv(filtered_dataset2, "CA11_vectors.csv")
+
+write.csv(unmatched_matched_vectors, "CA11_unmatched_vectors.csv")
 ### YEAR 2011 ###
 
 list_census_regions('CA11')
@@ -276,6 +321,47 @@ output_folder_11 <- "census_data11"  # Change to your desired path
 if (!dir.exists(output_folder_11)) {
   dir.create(output_folder_11, recursive = TRUE)
 }
+
+# Check if the vectors in the list are in the census data
+vectors_11 = c("v_CA11_454","v_CA11_463","v_CA11_466","v_CA11_469","v_CA11_472","v_CA11_475","v_CA11_2207","v_CA11_2209","v_CA11_2208", "v_CA11_408","v_CA11_409",
+            "v_CA11_410","v_CA11_411","v_CA11_417","v_CA11_479","v_CA11_480","v_CA11_481","v_CA11_482","v_CA11_483",
+            "v_CA11_2309","v_CA11_2312","v_CA11_2315","v_CA11_2318","v_CA11_2321",
+            "v_CA11_2324","v_CA11_2327","v_CA11_2330","v_CA11_2333","v_CA11_2336","v_CA11_2339",
+            "v_CA11_2342","v_CA11_2570","v_CA11_2540","v_ CA11_5795","v_CA11_5798",
+            "v_CA11_5801","v_CA11_5804","v_CA11_5807","v_CA11_5810","v_CA11_5816","v_CA11_5819",
+            "v_CA11_5822","v_CA11_5825","v_CA11_5828",
+            "v_CA11_2427","v_CA11_2428","v_CA11_2429","v_CA11_2430","v_CA11_2431","v_CA11_2432","v_CA11_2433","v_CA11_2434","v_CA11_2435","v_CA11_2436",
+            "v_CA11_2437","v_CA11_2438","v_CA11_2439","v_CA11_2440","v_CA11_2441","v_CA11_2442",
+            "v_CA11_4893","v_CA11_4894","v_CA11_4895","v_CA11_4896","v_CA11_4891","v_CA11_4892",
+            "v_CA11_4897","v_CA11_4898","v_CA11_4898","v_CA11_4899","v_CA11_4900","v_CA11_4901",
+            "v_CA11_5099","v_CA11_5102","v_CA11_5108","v_CA11_5117","v_CA11_5120","v_CA11_5123",
+            "v_CA11_5603","v_CA11_5606","v_CA11_5609","v_CA11_5663","v_CA11_5669","v_CA11_5672","v_CA11_5675",
+            "v_CA11_5678","v_CA11_5681","v_CA11_5684","v_CA11_5687","v_CA11_5690",
+            "v_CA11_4002","v_CA11_4806","v_CA11_4014","v_CA11_4044","v_CA11_4266","v_CA11_4329","v_CA11_4611","v_CA11_4698",
+            "v_CA11_4743","v_CA11_4800","v_CA11_3408","v_CA11_3411","v_CA11_3435")
+
+list_vectors <- list_census_vectors("CA11")
+
+# Define empty lists to store results
+in_list <- c()
+out_list <- c()
+
+# Loop through vectors_11 and check if they exist in the census list
+for (i in vectors_11) {
+  if (i %in% list_census_vectors("CA11")) {
+    in_list <- c(in_list, i)  # Append to in_list
+  } else {
+    out_list <- c(out_list, i)  # Append to out_list
+  }
+}
+
+# Print the results
+print("Variables in list:")
+print(in_list)
+
+print("Variables not in list:")
+print(out_list)
+
 
 for (i in 1:nrow(csd_regions_11)) {
   csd_id_11 <- csd_regions_11$region[i]  
