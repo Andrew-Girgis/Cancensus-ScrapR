@@ -295,7 +295,7 @@ filtered_dataset2 <- semi_join(ureal, matched_vectors, by = c("type", "label"))
 print(filtered_dataset2)
 
 # Get variables in matched_vectors that were NOT in ureal
-unmatched_matched_vectors <- anti_join(matched_vectors, ureal, by = c("type", "label"))
+unmatched_matched_vectors <- anti_join(matched_vectors, ureal, by = c("label"))
 
 # Print the unmatched rows
 print(unmatched_matched_vectors)
@@ -508,7 +508,7 @@ vectors <- c("v_CA16_454","v_CA16_463","v_CA16_466","v_CA16_469","v_CA16_472","v
              "v_CA16_4743","v_CA16_4800","v_CA16_3408","v_CA16_3411","v_CA16_3435")
 
 # Get all available variables
-variables <- list_census_vectors("CA16")
+variables <- list_census_vectors("CA11")
 
 matched_results <- variables[variables$vector %in% vectors, , drop = FALSE]
 print(matched_results)
@@ -519,3 +519,14 @@ write.csv(matched_results, "matched_variables.csv", row.names = FALSE)
 
 print("Done!")
 
+# Import the json file
+library(jsonlite)
+library(httr)
+library(stringr)
+
+
+# Load the JSON file
+json_data <- read_json("methoData.json", simplifyVector = TRUE)
+
+
+json_data$airTemperatures$airTemperature[which(str_detect(json_data$DAs$GeoUID, "^591700"))]
