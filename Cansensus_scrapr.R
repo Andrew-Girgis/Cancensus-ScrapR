@@ -323,22 +323,19 @@ if (!dir.exists(output_folder_11)) {
 }
 
 # Check if the vectors in the list are in the census data
-vectors_11 = c("v_CA11_454","v_CA11_463","v_CA11_466","v_CA11_469","v_CA11_472","v_CA11_475","v_CA11_2207","v_CA11_2209","v_CA11_2208", "v_CA11_408","v_CA11_409",
-            "v_CA11_410","v_CA11_411","v_CA11_417","v_CA11_479","v_CA11_480","v_CA11_481","v_CA11_482","v_CA11_483",
-            "v_CA11_2309","v_CA11_2312","v_CA11_2315","v_CA11_2318","v_CA11_2321",
-            "v_CA11_2324","v_CA11_2327","v_CA11_2330","v_CA11_2333","v_CA11_2336","v_CA11_2339",
-            "v_CA11_2342","v_CA11_2570","v_CA11_2540","v_ CA11_5795","v_CA11_5798",
-            "v_CA11_5801","v_CA11_5804","v_CA11_5807","v_CA11_5810","v_CA11_5816","v_CA11_5819",
-            "v_CA11_5822","v_CA11_5825","v_CA11_5828",
-            "v_CA11_2427","v_CA11_2428","v_CA11_2429","v_CA11_2430","v_CA11_2431","v_CA11_2432","v_CA11_2433","v_CA11_2434","v_CA11_2435","v_CA11_2436",
-            "v_CA11_2437","v_CA11_2438","v_CA11_2439","v_CA11_2440","v_CA11_2441","v_CA11_2442",
-            "v_CA11_4893","v_CA11_4894","v_CA11_4895","v_CA11_4896","v_CA11_4891","v_CA11_4892",
-            "v_CA11_4897","v_CA11_4898","v_CA11_4898","v_CA11_4899","v_CA11_4900","v_CA11_4901",
-            "v_CA11_5099","v_CA11_5102","v_CA11_5108","v_CA11_5117","v_CA11_5120","v_CA11_5123",
-            "v_CA11_5603","v_CA11_5606","v_CA11_5609","v_CA11_5663","v_CA11_5669","v_CA11_5672","v_CA11_5675",
-            "v_CA11_5678","v_CA11_5681","v_CA11_5684","v_CA11_5687","v_CA11_5690",
-            "v_CA11_4002","v_CA11_4806","v_CA11_4014","v_CA11_4044","v_CA11_4266","v_CA11_4329","v_CA11_4611","v_CA11_4698",
-            "v_CA11_4743","v_CA11_4800","v_CA11_3408","v_CA11_3411","v_CA11_3435")
+vectors_11 = c("v_CA11F_101", "v_CA11F_104", "v_CA11F_107", "v_CA11F_211", "v_CA11F_212", "v_CA11F_213", "v_CA11F_200", "v_CA11F_202",  
+               "v_CA11N_19", "v_CA11N_22", "v_CA11N_46", "v_CA11N_70", "v_CA11N_79", "v_CA11N_262", "v_CA11N_505", "v_CA11N_517",  
+               "v_CA11N_547", "v_CA11N_760", "v_CA11N_820", "v_CA11N_1084", "v_CA11N_1162", "v_CA11N_1204", "v_CA11N_1258", 
+               "v_CA11N_1264", "v_CA11N_1774", "v_CA11N_1783", "v_CA11N_1786", "v_CA11N_1789", "v_CA11N_1792", "v_CA11N_1804", "v_CA11N_1813",
+               "v_CA11N_1816", "v_CA11N_1819", "v_CA11N_1822", "v_CA11N_1993", "v_CA11N_1996", "v_CA11N_1999", "v_CA11N_2035", "v_CA11N_2041", 
+               "v_CA11N_2044", "v_CA11N_2047", "v_CA11N_2050", "v_CA11N_2053", "v_CA11N_2056", "v_CA11N_2059", "v_CA11N_2062", "v_CA11N_2200", 
+               "v_CA11N_2203", "v_CA11N_2206", "v_CA11N_2282", "v_CA11N_2284", "v_CA11N_2285", "v_CA11N_2286", "v_CA11N_2287", "v_CA11N_2289",
+               "v_CA11N_2291", "v_CA11N_2292", "v_CA11N_2302", "v_CA11N_2305", "v_CA11N_2308", "v_CA11N_2311", "v_CA11N_2314", "v_CA11N_2317", 
+               "v_CA11N_2320", "v_CA11N_2323", "v_CA11N_2332", "v_CA11N_2356", "v_CA11N_2359", "v_CA11N_2362", "v_CA11N_2365", "v_CA11N_2368",
+               "v_CA11N_2371", "v_CA11N_2374", "v_CA11N_2377", "v_CA11N_2386", "v_CA11N_2534", "v_CA11N_2535", "v_CA11N_2536", "v_CA11N_2537",
+               "v_CA11N_2538", "v_CA11N_2539", "v_CA11N_2540", "v_CA11N_2541", "v_CA11N_2548", "v_CA11N_2549", "v_CA11N_2550", "v_CA11N_2551",
+               "v_CA11N_2552", "v_CA11N_2553", "v_CA11N_2554", "v_CA11N_2555", "v_CA11N_2558", "v_CA11N_2035", "v_CA11N_2038", "v_CA11N_2041", 
+               "v_CA11N_2044", "v_CA11N_2047", "v_CA11N_2050", "v_CA11N_2053", "v_CA11N_2056", "v_CA11N_2059", "v_CA11N_2062")
 
 list_vectors <- list_census_vectors("CA11")
 
@@ -371,22 +368,19 @@ for (i in 1:nrow(csd_regions_11)) {
   data_11 <- get_census(
     dataset = "CA11",
     regions = list(CSD = csd_id_11),
-    vectors = c("v_CA11_454","v_CA11_463","v_CA11_466","v_CA11_469","v_CA11_472","v_CA11_475","v_CA11_2207","v_CA11_2209","v_CA11_2208", "v_CA11_408","v_CA11_409",
-                "v_CA11_410","v_CA11_411","v_CA11_417","v_CA11_479","v_CA11_480","v_CA11_481","v_CA11_482","v_CA11_483",
-                "v_CA11_2309","v_CA11_2312","v_CA11_2315","v_CA11_2318","v_CA11_2321",
-                "v_CA11_2324","v_CA11_2327","v_CA11_2330","v_CA11_2333","v_CA11_2336","v_CA11_2339",
-                "v_CA11_2342","v_CA11_2570","v_CA11_2540","v_CA11_5795","v_CA11_5798",
-                "v_CA11_5801","v_CA11_5804","v_CA11_5807","v_CA11_5810","v_CA11_5816","v_CA11_5819",
-                "v_CA11_5822","v_CA11_5825","v_CA11_5828",
-                "v_CA11_2427","v_CA11_2428","v_CA11_2429","v_CA11_2430","v_CA11_2431","v_CA11_2432","v_CA11_2433","v_CA11_2434","v_CA11_2435","v_CA11_2436",
-                "v_CA11_2437","v_CA11_2438","v_CA11_2439","v_CA11_2440","v_CA11_2441","v_CA11_2442",
-                "v_CA11_4893","v_CA11_4894","v_CA11_4895","v_CA11_4896","v_CA11_4891","v_CA11_4892",
-                "v_CA11_4897","v_CA11_4898","v_CA11_4898","v_CA11_4899","v_CA11_4900","v_CA11_4901",
-                "v_CA11_5099","v_CA11_5102","v_CA11_5108","v_CA11_5117","v_CA11_5120","v_CA11_5123",
-                "v_CA11_5603","v_CA11_5606","v_CA11_5609","v_CA11_5663","v_CA11_5669","v_CA11_5672","v_CA11_5675",
-                "v_CA11_5678","v_CA11_5681","v_CA11_5684","v_CA11_5687","v_CA11_5690",
-                "v_CA11_4002","v_CA11_4806","v_CA11_4014","v_CA11_4044","v_CA11_4266","v_CA11_4329","v_CA11_4611","v_CA11_4698",
-                "v_CA11_4743","v_CA11_4800","v_CA11_3408","v_CA11_3411","v_CA11_3435"), 
+    vectors = c("v_CA11F_101", "v_CA11F_104", "v_CA11F_107", "v_CA11F_211", "v_CA11F_212", "v_CA11F_213", "v_CA11F_200", "v_CA11F_202",  
+                "v_CA11N_19", "v_CA11N_22", "v_CA11N_46", "v_CA11N_70", "v_CA11N_79", "v_CA11N_262", "v_CA11N_505", "v_CA11N_517",  
+                "v_CA11N_547", "v_CA11N_760", "v_CA11N_820", "v_CA11N_1084", "v_CA11N_1162", "v_CA11N_1204", "v_CA11N_1258", 
+                "v_CA11N_1264", "v_CA11N_1774", "v_CA11N_1783", "v_CA11N_1786", "v_CA11N_1789", "v_CA11N_1792", "v_CA11N_1804", "v_CA11N_1813",
+                "v_CA11N_1816", "v_CA11N_1819", "v_CA11N_1822", "v_CA11N_1993", "v_CA11N_1996", "v_CA11N_1999", "v_CA11N_2035", "v_CA11N_2041", 
+                "v_CA11N_2044", "v_CA11N_2047", "v_CA11N_2050", "v_CA11N_2053", "v_CA11N_2056", "v_CA11N_2059", "v_CA11N_2062", "v_CA11N_2200", 
+                "v_CA11N_2203", "v_CA11N_2206", "v_CA11N_2282", "v_CA11N_2284", "v_CA11N_2285", "v_CA11N_2286", "v_CA11N_2287", "v_CA11N_2289",
+                "v_CA11N_2291", "v_CA11N_2292", "v_CA11N_2302", "v_CA11N_2305", "v_CA11N_2308", "v_CA11N_2311", "v_CA11N_2314", "v_CA11N_2317", 
+                "v_CA11N_2320", "v_CA11N_2323", "v_CA11N_2332", "v_CA11N_2356", "v_CA11N_2359", "v_CA11N_2362", "v_CA11N_2365", "v_CA11N_2368",
+                "v_CA11N_2371", "v_CA11N_2374", "v_CA11N_2377", "v_CA11N_2386", "v_CA11N_2534", "v_CA11N_2535", "v_CA11N_2536", "v_CA11N_2537",
+                "v_CA11N_2538", "v_CA11N_2539", "v_CA11N_2540", "v_CA11N_2541", "v_CA11N_2548", "v_CA11N_2549", "v_CA11N_2550", "v_CA11N_2551",
+                "v_CA11N_2552", "v_CA11N_2553", "v_CA11N_2554", "v_CA11N_2555", "v_CA11N_2558", "v_CA11N_2035", "v_CA11N_2038", "v_CA11N_2041", 
+                "v_CA11N_2044", "v_CA11N_2047", "v_CA11N_2050", "v_CA11N_2053", "v_CA11N_2056", "v_CA11N_2059", "v_CA11N_2062"), 
     level = "DA"
   )  
   # Save CSV to the specified folder
@@ -508,7 +502,9 @@ vectors <- c("v_CA16_454","v_CA16_463","v_CA16_466","v_CA16_469","v_CA16_472","v
              "v_CA16_4743","v_CA16_4800","v_CA16_3408","v_CA16_3411","v_CA16_3435")
 
 # Get all available variables
-variables <- list_census_vectors("CA16")
+variables <- list_census_vectors("CA21")
+
+print(variables)
 
 matched_results <- variables[variables$vector %in% vectors, , drop = FALSE]
 print(matched_results)
@@ -518,3 +514,68 @@ write.csv(matched_results, "matched_variables.csv", row.names = FALSE)
 
 
 print("Done!")
+
+
+data_2016 <- list_census_vectors("CA16")
+
+data_2021 <- list_census_vectors("CA21")
+
+data_2016 <- data_2016[data_2016$vector %in% vectors, , drop = FALSE]
+
+filtered_dataset <- data_2021 %>%
+  filter(type %in% data_2016$type & 
+           label %in% data_2016$label & 
+           units %in% data_2016$units & 
+           aggregation %in% data_2016$aggregation)
+
+filtered_dataset <- data_2021 %>%
+  filter(paste(type, label, units, aggregation) %in% 
+           paste(data_2016$type, data_2016$label, data_2016$units, data_2016$aggregation))
+
+
+variables_11 <- list_census_vectors("CA11")
+class(variables_11)
+
+filtered_df <- variables_11 %>%
+  filter(grepl("occupation", label, ignore.case = TRUE)) %>%
+  filter(type == "Total")
+
+View(filtered_df)
+
+needed_vecs <- filtered_df$vector[4:nrow(filtered_df)]
+print(needed_vecs)
+
+variables_census <- get_census(dataset = "CA11")
+
+library(cancensus)
+
+da_regions <- list_census_regions("CA21", province = "ON") %>%
+  filter(level == "DA")
+
+View(da_regions)
+
+# append rows 4 to nrow(filtered_df) to filtered_dataset2
+filtered_dataset2 <- rbind(filtered_dataset2, filtered_df[4:nrow(filtered_df),])
+
+vec_2011 <- filtered_dataset2$vector
+print(vec_2011)
+
+
+
+merged_dataset <- filtered_dataset %>%
+  inner_join(filtered_dataset2, by = c("type", "label", "units", "aggregation"))%>%
+  inner_join(data_2016, by = c("type", "label", "units", "aggregation"))
+
+write.csv(merged_dataset, "merged_dataset.csv")
+
+
+library(dplyr)
+
+# Check for duplicates based on all columns
+duplicates <- merged_dataset %>%
+  group_by(type, label, units, aggregation) %>%
+  filter(n() > 1) %>%
+  ungroup()
+
+# Print duplicate rows
+print(duplicates)
