@@ -508,7 +508,7 @@ vectors <- c("v_CA16_454","v_CA16_463","v_CA16_466","v_CA16_469","v_CA16_472","v
              "v_CA16_4743","v_CA16_4800","v_CA16_3408","v_CA16_3411","v_CA16_3435")
 
 # Get all available variables
-variables <- list_census_vectors("CA11")
+variables <- ("CA11")
 
 matched_results <- variables[variables$vector %in% vectors, , drop = FALSE]
 print(matched_results)
