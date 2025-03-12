@@ -542,6 +542,7 @@ filtered_df <- variables_11 %>%
 
 View(filtered_df)
 
+ 
 needed_vecs <- filtered_df$vector[4:nrow(filtered_df)]
 print(needed_vecs)
 
@@ -586,3 +587,4 @@ duplicates <- merged_dataset %>%
 
 # Print duplicate rows
 print(duplicates)
+
