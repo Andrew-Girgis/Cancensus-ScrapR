@@ -515,6 +515,7 @@ write.csv(matched_results, "matched_variables.csv", row.names = FALSE)
 
 print("Done!")
 
+data_2011 <- list_census_vectors("CA11")
 
 data_2016 <- list_census_vectors("CA16")
 
@@ -531,7 +532,6 @@ filtered_dataset <- data_2021 %>%
 filtered_dataset <- data_2021 %>%
   filter(paste(type, label, units, aggregation) %in% 
            paste(data_2016$type, data_2016$label, data_2016$units, data_2016$aggregation))
-
 
 variables_11 <- list_census_vectors("CA11")
 class(variables_11)
@@ -560,16 +560,23 @@ filtered_dataset2 <- rbind(filtered_dataset2, filtered_df[4:nrow(filtered_df),])
 vec_2011 <- filtered_dataset2$vector
 print(vec_2011)
 
-
+library(dplyr)
 
 merged_dataset <- filtered_dataset %>%
-  inner_join(filtered_dataset2, by = c("type", "label", "units", "aggregation"))%>%
-  inner_join(data_2016, by = c("type", "label", "units", "aggregation"))
+  inner_join(filtered_dataset2, by = c("type", "label"))%>%
+  inner_join(data_2016, by = c("type", "label"))
+
+# drop duplicates in the dataset based on vector.x column
+merged_dataset <- merged_dataset %>%
+  distinct(details.x, .keep_all = TRUE)
+
+# print number of rows in the merged dataset
+print(nrow(merged_dataset))
 
 write.csv(merged_dataset, "merged_dataset.csv")
 
 
-library(dplyr)
+
 
 # Check for duplicates based on all columns
 duplicates <- merged_dataset %>%
