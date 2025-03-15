@@ -23,4 +23,5 @@ matched_variables.csv
 matched_variables.xlsx 
 merged_dataset.csv 
 "~$matched_variables.xlsx"
+.Renviron
 
