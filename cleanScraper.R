@@ -1,27 +1,14 @@
-library(PerformanceAnalytics)
 library(tidyverse)
-library(readxl)
 library(readr)
-library(ggplot2)
-library(scales)
-library(corrplot)
-library(glmnet)
-library(sandwich)
-options(warn=-1)
-library(tseries)
-library(lmtest)
-library(stargazer)
-library(DataCombine)
-library(ivreg)
-library(forecast)
-library("margins")
 library(cancensus)
 library(rjson)
 library(jsonlite)
 library(httr)
 library(stringr)
 
-options(cancensus.api_key='CensusMapper_92d778fbc9cacfa147fe91e0e2f9d66e')
+
+api_key <- Sys.getenv("CANCENSUS_API_KEY")
+options(cancensus.api_key=api_key)
 options(cancensus.cache_path ="cansensus_cache")
 
 output_folder_11 <- "census_data11"
@@ -31,6 +18,18 @@ output_folder_21 <- "census_data21"
 # Choose the city or cities you would like 
 cities <- c("Oakville")
 level <- "CSD"
+
+# OR filter data for top 50 pop cities
+regions_11 <- list_census_regions("CA11")# Get all census regions
+csd_regions_11 <- regions_11[regions_11$level == "CSD", ]  # Filter for Census Subdivisions (CSDs)
+csd_regions_11 <- csd_regions_11 %>%
+  arrange(desc(pop)) %>%  # Sort by population in descending order
+  head(50)  # Select the top 50
+
+# loop through the cities in the top 50 list
+for (i in 1:nrow(csd_regions_11)) {
+  csd_regions_11$name <- gsub("[^A-Za-z0-9_À-ÿ\\-]", "_", csd_regions_11$name) # Replace special characters with underscore
+}
 
 ### Year 2011 ###
 vectors_2011 = c("v_CA11F_199", "v_CA11F_200", "v_CA11F_201", "v_CA11F_202", "v_CA11F_203",
@@ -58,9 +57,11 @@ vectors_df_2011 <- vectors_df_2011[vectors_df_2011$vector %in% vectors_2011,]
 
 
 regions_2011 <- list_census_regions("CA11") # Get all census regions
-csd_regions_2011 <- regions_2011[regions_2011$level == level & regions_2011$name %in% cities, ]
+for (i in 1:nrow(regions_2011)) {
+  regions_2011$name <- gsub("[^A-Za-z0-9_À-ÿ\\-]", "_", regions_2011$name) # Replace special characters with underscore
+}
+csd_regions_2011 <- regions_2011[regions_2011$level == level & regions_2011$name %in% csd_regions_11$name, ]
 print(csd_regions_2011)
-
 
 
 for (i in 1:nrow(csd_regions_2011)) {
@@ -99,7 +100,10 @@ vectors_df_2016 <- list_census_vectors("CA16")
 vectors_df_2016 <- vectors_df_2016[vectors_df_2016$vector %in% vectors_2016,]
 
 regions_2016 <- list_census_regions("CA16") # Get all census regions
-csd_regions_2016 <- regions_2016[regions_2016$level == level & regions_2016$name %in% cities, ]
+for (i in 1:nrow(regions_2016)) {
+  regions_2016$name <- gsub("[^A-Za-z0-9_À-ÿ\\-]", "_", regions_2016$name) # Replace special characters with underscore
+}
+csd_regions_2016 <- regions_2016[regions_2016$level == level & regions_2016$name %in% csd_regions_11$name, ]
 print(csd_regions_2016)
 
 for (i in 1:nrow(csd_regions_2016)) {
@@ -144,7 +148,10 @@ vectors_df_2021 <- list_census_vectors("CA21")
 vectors_df_2021 <- vectors_df_2021[vectors_df_2021$vector %in% vectors_2021,]
 
 regions_2021 <- list_census_regions("CA21") # Get all census regions
-csd_regions_2021 <- regions_2021[regions_2021$level == level & regions_2021$name %in% cities, ]
+for (i in 1:nrow(regions_2021)) {
+  regions_2021$name <- gsub("[^A-Za-z0-9_À-ÿ\\-]", "_", regions_2021$name) # Replace special characters with underscore
+}
+csd_regions_2021 <- regions_2021[regions_2021$level == level & regions_2021$name %in% csd_regions_11$name, ]
 print(csd_regions_2021)
 
 
@@ -152,6 +159,7 @@ print(csd_regions_2021)
 for (i in 1:nrow(csd_regions_2021)) {
   csd_id_21 <- csd_regions_2021$region[i]
   csd_name_21 <- csd_regions_2021$name[i]
+  print(csd_name_21)
   data_21 <- get_census(
     dataset = "CA21",
     regions = list(CSD = csd_id_21),
