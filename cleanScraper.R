@@ -55,6 +55,8 @@ vectors_df_2011 <- list_census_vectors("CA11")
 
 vectors_df_2011 <- vectors_df_2011[vectors_df_2011$vector %in% vectors_2011,]
 
+# Reorder according to vectors_2011
+vectors_df_2011 <- vectors_df_2011[match(vectors_2011, vectors_df_2011$vector), ]
 
 regions_2011 <- list_census_regions("CA11") # Get all census regions
 for (i in 1:nrow(regions_2011)) {
@@ -169,4 +171,19 @@ for (i in 1:nrow(csd_regions_2021)) {
   # Save CSV to the specified folder
   write.csv(data_21, file = file.path(output_folder_21, paste0(csd_name_21, "_21.csv")))
 }
+
+### Merge all the data into one file ###
+
+# Give Vectors df a id column in the first column
+vectors_df_2011$id <- 1:nrow(vectors_df_2011)
+vectors_df_2016$id <- 1:nrow(vectors_df_2016)
+vectors_df_2021$id <- 1:nrow(vectors_df_2021)
+
+# Merge all the vectors data into one file by joining on the id column
+vectors_df <- merge(vectors_df_2011, vectors_df_2016, by = "id", all = TRUE)
+vectors_df <- merge(vectors_df, vectors_df_2021, by = "id", all = TRUE)
+
+# Save the merged data to a CSV file
+write.csv(vectors_df, file = "vectors_list.csv")
+
 
