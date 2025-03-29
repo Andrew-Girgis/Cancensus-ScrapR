@@ -2,7 +2,15 @@ library(shiny)
 library(dplyr)
 library(cancensus)
 library(DT)
+library(bslib)
+library(zip)
 library(shinyWidgets)
+
+api_key <- Sys.getenv("CANCENSUS_API_KEY")
+options(cancensus.api_key=api_key)
+options(cancensus.cache_path ="cansensus_cache")
+
+cancensus::set_api_key(api_key)
 
 # Set up directories
 dir.create("census_cache", showWarnings = FALSE)
@@ -73,9 +81,14 @@ get_year_vectors <- function(year) {
   return(vectors)
 }
 
+# FUnction to get last two digits of year
+get_dataset_id <- function(year) {
+  paste0("CA", substr(as.character(year), 3, 4))
+}
+
 # Function to get the top 50 cities
 get_top_cities <- function(year) {
-  regions <- list_census_regions(paste0("CA", year))
+  regions <- list_census_regions(paste0("CA", substr(as.character(year), 3, 4)))
   csd_regions <- regions[regions$level == "CSD", ]
   
   # Sort by population and take top 50
@@ -105,6 +118,10 @@ ui <- fluidPage(
              radioButtons("year", "Select Census Year:",
                           choices = c("2011", "2016", "2021"),
                           selected = "2016"),
+             # Level selection
+             radioButtons("level", "Select Geographic Level:",
+                          choices = c("Census Tract" = "CT", "Dissemination Area" = "DA", "Census Subdivision" = "CSD"),
+                          selected = "CT"),
              
              # City selection
              uiOutput("citySelector"),
@@ -214,7 +231,8 @@ server <- function(input, output, session) {
   vectorInfo <- reactive({
     req(input$year, vectors())
     withProgress(message = 'Getting variable info...', {
-      all_vectors <- list_census_vectors(paste0("CA", input$year))
+      dataset_id <- paste0("CA", substr(input$year, 3, 4)) 
+      all_vectors <- list_census_vectors(dataset_id)
       vector_info <- all_vectors[all_vectors$vector %in% vectors(), c("vector", "label")]
       return(vector_info)
     })
@@ -260,7 +278,7 @@ server <- function(input, output, session) {
         # Try to get census data for this city
         tryCatch({
           city_data <- get_census(
-            dataset = paste0("CA", input$year),
+            dataset = paste0("CA", substr(input$year, 3, 4)),
             regions = list(CSD = city_id),
             vectors = vectors(),
             level = input$level
@@ -288,38 +306,37 @@ server <- function(input, output, session) {
   # Preview table
   output$dataPreview <- DT::renderDataTable({
     data <- censusData()
-    if(is.null(data)) {
+    if (is.null(data)) {
       return(data.frame(Message = "No data available. Please select at least one city and try again."))
     }
     
-    # Select only important columns for preview
+    # Base preview columns
     preview_cols <- c("GeoUID", "Region Name", "Population", "Households")
-    # Add a few vector columns
-    vector_cols <- colnames(data)[grep("^v_CA", colnames(data))]
-    if(length(vector_cols) > 0) {
-      preview_cols <- c(preview_cols, vector_cols[1:min(5, length(vector_cols))])
+    
+    # Add a few vector columns (if available)
+    vector_cols <- grep("^v_CA", colnames(data), value = TRUE)
+    if (length(vector_cols) > 0) {
+      preview_cols <- c(preview_cols, head(vector_cols, 5))
     }
     
-    # Filter to columns that actually exist in the data
+    # Keep only valid column names
     preview_cols <- preview_cols[preview_cols %in% colnames(data)]
     
-    # If we have no matching columns, just show the first few
-    if(length(preview_cols) == 0) {
-      preview_cols <- colnames(data)[1:min(8, ncol(data))]
+    # If no valid columns found, just show first 8 columns
+    if (length(preview_cols) == 0) {
+      preview_cols <- head(colnames(data), 8)
     }
     
-    # Limit to first 10 rows for preview
-    preview_data <- data[1:min(10, nrow(data)), preview_cols, drop = FALSE]
+    # Limit to first 10 rows
+    preview_data <- head(data[, preview_cols, drop = FALSE], 10)
     
     DT::datatable(
-      preview_data, 
-      options = list(
-        scrollX = TRUE,
-        pageLength = 5
-      ),
+      preview_data,
+      options = list(scrollX = TRUE, pageLength = 5),
       caption = "Preview of Census Data (first 10 rows)"
     )
   })
+  
   
   # Status message
   output$statusMessage <- renderUI({
@@ -340,38 +357,45 @@ server <- function(input, output, session) {
     }
   })
   
-  # Download handler
   output$downloadData <- downloadHandler(
     filename = function() {
-      # Create a filename with the year and selected cities
-      city_count <- length(input$selectedCities)
-      city_text <- if(city_count <= 3) {
-        paste(cities()$name[match(input$selectedCities, cities()$region)], collapse="-")
-      } else {
-        paste0(city_count, "_cities")
-      }
-      
-      paste0("census_", input$year, "_", city_text, "_", input$level, "_", Sys.Date(), ".csv")
+      paste0("census_", input$year, "_", Sys.Date(), ".zip")
     },
     content = function(file) {
-      data <- censusData()
-      if(!is.null(data)) {
-        # Add metadata as comments at the top of the CSV
-        cat("# Canadian Census Data Export\n", file=file)
-        cat(paste0("# Date: ", Sys.Date(), "\n"), file=file, append=TRUE)
-        cat(paste0("# Year: ", input$year, "\n"), file=file, append=TRUE)
-        cat(paste0("# Geographic Level: ", input$level, "\n"), file=file, append=TRUE)
+      tryCatch({
+        data <- censusData()
         
-        # Write the data
-        write.csv(data, file, row.names = FALSE, append=TRUE)
-      } else {
-        # Create an empty file with an error message
-        write.csv(
-          data.frame(Error = "No data available for the selected options."), 
-          file, 
-          row.names = FALSE
-        )
-      }
+        # Check data
+        if (is.null(data)) {
+          stop("No data available for download.")
+        }
+        
+        # Ensure zip lib is loaded
+        if (!requireNamespace("zip", quietly = TRUE)) {
+          stop("The 'zip' package is required but not installed.")
+        }
+        
+        # Temp files
+        temp_csv <- tempfile(fileext = ".csv")
+        temp_txt <- tempfile(fileext = ".txt")
+        
+        # Write CSV and metadata
+        write.csv(data, temp_csv, row.names = FALSE)
+        writeLines(c(
+          "Canadian Census Data Export",
+          paste0("Date: ", Sys.Date()),
+          paste0("Year: ", input$year),
+          paste0("Geographic Level: ", input$level),
+          paste0("Selected Cities: ", paste(input$selectedCities, collapse = ", "))
+        ), con = temp_txt)
+        
+        # Zip the files
+        zip::zipr(zipfile = file, files = c(temp_csv, temp_txt))
+        
+      }, error = function(e) {
+        # Log error for debug
+        message("Download error: ", e$message)
+      })
     }
   )
 }
