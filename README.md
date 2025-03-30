@@ -55,7 +55,7 @@ cd your-repo-name
 
 2. **Identify census vectors:**
 
-- Review the file containing census vector IDs (e.g., `vectors_list.csv`) provided within the repository to confirm or adjust the vectors you wish to retrieve.
+- Review the file containing census vector IDs (`vectors_list.csv`) provided within the repository to confirm or adjust the vectors you wish to retrieve.
 
 3. **Run the R script:**
 
