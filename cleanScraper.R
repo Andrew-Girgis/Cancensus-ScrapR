@@ -187,3 +187,121 @@ vectors_df <- merge(vectors_df, vectors_df_2021, by = "id", all = TRUE)
 write.csv(vectors_df, file = "vectors_list.csv")
 
 
+### AIR TEMP WORK ###
+
+# Load required libraries
+library(dplyr)
+library(stringr)
+library(cancensus)
+library(jsonlite)
+
+airtemp_output_folder_21 <- "airtemp_census_data21"
+
+# ---- Load and prepare data ----
+
+# Load the JSON file
+json_data <- read_json("methoData.json", simplifyVector = TRUE)
+
+# Convert air temperature data to a data frame
+airtemps_df <- as.data.frame(json_data$airTemperatures)
+
+# Let's assume your hourly air temperature data is stored in a data frame called airtemps_df
+# And it has columns like: datetime, date, airTemperature, metro
+
+# Convert airTemperature to numeric just in case
+airtemps_df$airTemperature <- as.numeric(airtemps_df$airTemperature)
+
+# Group by date and metro, and calculate the daily average temperature
+daily_avg_temps <- airtemps_df %>%
+  group_by(date, metro) %>%
+  summarise(
+    avg_air_temp = mean(airTemperature, na.rm = TRUE),
+    n_obs = n(),
+    .groups = "drop"
+  )
+
+# View the first few rows
+head(daily_avg_temps)
+
+
+# 1. Filter regions_2021 to keep only CSD-level regions
+csd_regions <- regions_2021 %>%
+  filter(level == "CSD")
+
+# 2. Clean the metro names from daily_avg_temps and region names for comparison
+clean_names <- function(x) {
+  x %>%
+    str_to_lower() %>%
+    str_replace_all("\\s*\\([^\\)]+\\)", "") %>%  # Remove content in parentheses
+    str_replace_all("_", " ") %>%
+    str_replace_all("[[:punct:]]", "") %>%
+    str_squish()
+}
+
+# Clean the metro and region names
+daily_avg_temps <- daily_avg_temps %>%
+  mutate(clean_metro = clean_names(metro))
+
+csd_regions <- csd_regions %>%
+  mutate(clean_name = clean_names(name))
+
+# 3. Filter regions_2021 where the cleaned name is in the cleaned metro list
+matched_regions <- daily_avg_temps %>%
+  filter(clean_metro %in% csd_regions$clean_name)
+
+# View result
+head(matched_regions)
+
+matched_regions <- matched_regions %>%
+  filter(date >= "2021-01-01")
+
+# Filter duplicate metro
+matched_regions <- matched_regions %>%
+  distinct(clean_metro, .keep_all = TRUE)
+
+
+# 4. Merge the matched regions with the CSD-level census data
+merged_data <- matched_regions %>%
+  left_join(csd_regions, by = c("clean_metro" = "clean_name"))
+
+# Filter duplicate metro
+merged_data <- merged_data %>%
+  distinct(clean_metro, .keep_all = TRUE)
+
+
+### Airtemps Year 2021 ###
+airtemps_csd_regions_2021 <- csd_regions_2021 %>%
+  mutate(clean_name = clean_names(name)) %>%
+  filter(clean_name %in% merged_data$clean_metro)
+
+for (i in 1:nrow(airtemps_csd_regions_2021)) {
+  csd_id_21 <- airtemps_csd_regions_2021$region[i]
+  csd_name_21 <- airtemps_csd_regions_2021$name[i]
+  print(airtemps_csd_regions_2021)
+  airtemp_data_21 <- get_census(
+    dataset = "CA21",
+    regions = list(CSD = csd_id_21),
+    vectors = vectors_2021, 
+    level = "CSD"
+  )  
+  #merge with airtemps
+  airtemp_data_21 <- airtemp_data_21 %>%
+    mutate(clean_name = clean_names(`Region Name`)) %>%
+    left_join(matched_regions, by = c("clean_name" = "clean_metro"))
+  
+  airtemp_data_21 <- airtemp_data_21 %>%
+    select(-clean_name, -metro, -n_obs)
+  
+  # Save CSV to the specified folder
+  write.csv(airtemp_data_21, file = file.path(airtemp_output_folder_21, paste0(csd_name_21, "_21.csv")))
+}
+
+
+
+
+
+
+
+
+
+
