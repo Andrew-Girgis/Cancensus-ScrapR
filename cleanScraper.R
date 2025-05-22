@@ -24,7 +24,7 @@ regions_11 <- list_census_regions("CA11")# Get all census regions
 csd_regions_11 <- regions_11[regions_11$level == "CSD", ]  # Filter for Census Subdivisions (CSDs)
 csd_regions_11 <- csd_regions_11 %>%
   arrange(desc(pop)) %>%  # Sort by population in descending order
-  head(50)  # Select the top 50
+  head(60)  # Select the top 50
 
 # loop through the cities in the top 50 list
 for (i in 1:nrow(csd_regions_11)) {
